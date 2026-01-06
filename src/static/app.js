@@ -25,6 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
 
+  // Share modal elements
+  const shareModal = document.getElementById("share-modal");
+  const closeShareModal = document.querySelector(".close-share-modal");
+  const shareActivityName = document.getElementById("share-activity-name");
+  const shareTwitterBtn = document.getElementById("share-twitter");
+  const shareFacebookBtn = document.getElementById("share-facebook");
+  const shareWhatsAppBtn = document.getElementById("share-whatsapp");
+  const shareEmailBtn = document.getElementById("share-email");
+  const shareCopyBtn = document.getElementById("share-copy");
+  const shareMessage = document.getElementById("share-message");
+
+  // Current activity being shared
+  let currentShareActivity = null;
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
@@ -65,6 +79,127 @@ document.addEventListener("DOMContentLoaded", () => {
       currentTimeRange = activeTimeFilter.dataset.time;
     }
   }
+
+  // Share modal functions
+  function openShareModal(activityName, activityDetails) {
+    currentShareActivity = { name: activityName, details: activityDetails };
+    shareActivityName.textContent = activityName;
+    shareMessage.classList.add("hidden");
+    shareModal.classList.remove("hidden");
+    setTimeout(() => {
+      shareModal.classList.add("show");
+    }, 10);
+  }
+
+  function closeShareModalHandler() {
+    shareModal.classList.remove("show");
+    setTimeout(() => {
+      shareModal.classList.add("hidden");
+      currentShareActivity = null;
+    }, 300);
+  }
+
+  function getShareUrl() {
+    // Create a shareable URL (use current page URL as base)
+    const baseUrl = window.location.href.split('?')[0];
+    return baseUrl;
+  }
+
+  function getShareText(activityName, activityDetails) {
+    const schedule = formatSchedule(activityDetails);
+    return `Check out this activity at Mergington High School: ${activityName}! ${activityDetails.description} Schedule: ${schedule}`;
+  }
+
+  function showShareMessage(text, type) {
+    shareMessage.textContent = text;
+    shareMessage.className = `message ${type}`;
+    shareMessage.classList.remove("hidden");
+
+    // Hide message after 3 seconds
+    setTimeout(() => {
+      shareMessage.classList.add("hidden");
+    }, 3000);
+  }
+
+  // Share to Twitter
+  function shareToTwitter() {
+    if (!currentShareActivity) return;
+    
+    const text = getShareText(currentShareActivity.name, currentShareActivity.details);
+    const url = getShareUrl();
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, '_blank', 'width=600,height=400');
+  }
+
+  // Share to Facebook
+  function shareToFacebook() {
+    if (!currentShareActivity) return;
+    
+    const url = getShareUrl();
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+  }
+
+  // Share to WhatsApp
+  function shareToWhatsApp() {
+    if (!currentShareActivity) return;
+    
+    const text = getShareText(currentShareActivity.name, currentShareActivity.details);
+    const url = getShareUrl();
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+    window.open(whatsappUrl, '_blank');
+  }
+
+  // Share via Email
+  function shareViaEmail() {
+    if (!currentShareActivity) return;
+    
+    const subject = `Mergington High School Activity: ${currentShareActivity.name}`;
+    const body = getShareText(currentShareActivity.name, currentShareActivity.details) + '\n\n' + getShareUrl();
+    const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+  }
+
+  // Copy link to clipboard
+  async function copyLinkToClipboard() {
+    if (!currentShareActivity) return;
+    
+    const url = getShareUrl();
+    try {
+      await navigator.clipboard.writeText(url);
+      showShareMessage('Link copied to clipboard!', 'success');
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showShareMessage('Link copied to clipboard!', 'success');
+      } catch (err) {
+        showShareMessage('Failed to copy link', 'error');
+      }
+      document.body.removeChild(textArea);
+    }
+  }
+
+  // Event listeners for share modal
+  closeShareModal.addEventListener("click", closeShareModalHandler);
+  shareTwitterBtn.addEventListener("click", shareToTwitter);
+  shareFacebookBtn.addEventListener("click", shareToFacebook);
+  shareWhatsAppBtn.addEventListener("click", shareToWhatsApp);
+  shareEmailBtn.addEventListener("click", shareViaEmail);
+  shareCopyBtn.addEventListener("click", copyLinkToClipboard);
+
+  // Close share modal when clicking outside
+  window.addEventListener("click", (event) => {
+    if (event.target === shareModal) {
+      closeShareModalHandler();
+    }
+  });
 
   // Function to set day filter
   function setDayFilter(day) {
@@ -569,6 +704,10 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <button class="share-activity-btn" data-activity="${name}">
+        <span class="share-icon">🔗</span>
+        <span>Share</span>
+      </button>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +725,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for share button
+    const shareButton = activityCard.querySelector(".share-activity-btn");
+    shareButton.addEventListener("click", () => {
+      openShareModal(name, details);
+    });
 
     activitiesList.appendChild(activityCard);
   }

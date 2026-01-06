@@ -168,6 +168,38 @@
       </div>
     </div>
 
+    <!-- Share Modal -->
+    <div id="share-modal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-share-modal">&times;</span>
+        <h3>Share Activity</h3>
+        <p id="share-activity-name" style="color: #666; margin-bottom: 15px;"></p>
+        <div class="share-buttons">
+          <button class="share-btn twitter-btn" id="share-twitter">
+            <span class="share-icon">🐦</span>
+            <span>Twitter</span>
+          </button>
+          <button class="share-btn facebook-btn" id="share-facebook">
+            <span class="share-icon">📘</span>
+            <span>Facebook</span>
+          </button>
+          <button class="share-btn whatsapp-btn" id="share-whatsapp">
+            <span class="share-icon">💬</span>
+            <span>WhatsApp</span>
+          </button>
+          <button class="share-btn email-btn" id="share-email">
+            <span class="share-icon">✉️</span>
+            <span>Email</span>
+          </button>
+          <button class="share-btn copy-btn" id="share-copy">
+            <span class="share-icon">📋</span>
+            <span>Copy Link</span>
+          </button>
+        </div>
+        <div id="share-message" class="hidden message"></div>
+      </div>
+    </div>
+
     <script src="app.js"></script>
   </body>
 </html>
