@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 300);
   }
 
-  function getShareUrl() {
+  function getBaseUrl() {
     // Create a shareable URL (use current page URL as base)
     const baseUrl = window.location.href.split('?')[0];
     return baseUrl;
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentShareActivity) return;
     
     const text = getShareText(currentShareActivity.name, currentShareActivity.details);
-    const url = getShareUrl();
+    const url = getBaseUrl();
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, '_blank', 'width=600,height=400');
   }
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function shareToFacebook() {
     if (!currentShareActivity) return;
     
-    const url = getShareUrl();
+    const url = getBaseUrl();
     const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
     window.open(facebookUrl, '_blank', 'width=600,height=400');
   }
@@ -145,7 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentShareActivity) return;
     
     const text = getShareText(currentShareActivity.name, currentShareActivity.details);
-    const url = getShareUrl();
+    const url = getBaseUrl();
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
     window.open(whatsappUrl, '_blank');
   }
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!currentShareActivity) return;
     
     const subject = `Mergington High School Activity: ${currentShareActivity.name}`;
-    const body = getShareText(currentShareActivity.name, currentShareActivity.details) + '\n\n' + getShareUrl();
+    const body = getShareText(currentShareActivity.name, currentShareActivity.details) + '\n\n' + getBaseUrl();
     const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
   }
@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function copyLinkToClipboard() {
     if (!currentShareActivity) return;
     
-    const url = getShareUrl();
+    const url = getBaseUrl();
     try {
       await navigator.clipboard.writeText(url);
       showShareMessage('Link copied to clipboard!', 'success');
@@ -174,7 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
       textArea.value = url;
       textArea.style.position = 'fixed';
       textArea.style.left = '-999999px';
+      textArea.style.top = '0';
       document.body.appendChild(textArea);
+      textArea.focus();
       textArea.select();
       try {
         document.execCommand('copy');
